@@ -36,5 +36,5 @@ Rhythem saved even when power off.
 ## Demo
 
 <video width="512" height="512" controls>
-  <source src="demo.mp4" type="video/mp4">
+  <source src="./demo.mp4" type="video/mp4">
 </video>
