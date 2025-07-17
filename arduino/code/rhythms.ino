@@ -48,7 +48,6 @@ void stopRecording() {
   }
 
   _currentRhythmState = RHYTHM_IDLE;
-  startLedBlink();
   saveRhythm();
 }
 

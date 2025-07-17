@@ -32,3 +32,7 @@ Rhythem saved even when power off.
 ## Circuit
 
 ![circuit](fritzing/sketch.svg)
+
+## Demo
+
+![demo](demo.mp4)
