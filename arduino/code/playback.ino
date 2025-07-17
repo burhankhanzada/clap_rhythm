@@ -21,6 +21,7 @@ void playRhythm(int slot) {
 
   if (rhythms[slot].intervalCount < 1) {
     Serial.println("No Rhythm stored");
+    startLedBlink();
     return;
   }
 
