@@ -11,12 +11,12 @@ enum RhythmState {
 
 RhythmState _rhythmState = RHYTHM_IDLE;
 
-int _slot;
-int _rhythmLedPin;
+int _slot = -1;
+int _rhythmLedPin = -1;
 Rhythm _recordingRhythm;
 
-unsigned long _startTime;
-unsigned long _lastClapTime;
+unsigned long _startTime = 0;
+unsigned long _lastClapTime = 0;
 bool _firstClapDetected = false;
 
 void rhythmUpdate() {
