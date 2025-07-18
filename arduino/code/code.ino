@@ -1,16 +1,16 @@
 #define SOUND_PIN 2
 #define BUZZER_PIN 3
 
-const int maxRhythms = 3;
-const int maxClaps = 10;
-const long unsigned clapDuration = 100;
+const int MAX_RHYTHMS = 3;
+const int MAX_CLAPS = 10;
+const long unsigned CLAP_DURATION = 100;
 
 struct Rhythm {
   int intervalCount;
-  int intervals[maxClaps - 1];
+  unsigned long intervals[MAX_CLAPS - 1];
 };
 
-Rhythm rhythms[maxRhythms];
+Rhythm rhythms[MAX_RHYTHMS];
 
 void setup() {
 
@@ -19,15 +19,15 @@ void setup() {
   pinMode(SOUND_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
-  ledSetup();
-  buttonSetup();
+  ledInit();
+  buttonInit();
 
   loadRhythmsFromEEPROM();
 }
 
 void loop() {
-  ledLoop();
-  buttonLoop();
-  rhythmLoop();
-  playbackLoop();
+  ledUpdate();
+  buttonUpdate();
+  rhythmUpdate();
+  playbackUpdate();
 }

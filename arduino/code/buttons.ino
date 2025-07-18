@@ -2,35 +2,31 @@
 #define BUTTON_1_PIN 6
 #define BUTTON_2_PIN 5
 
-const int _buttonCount = 3;
+const int _BUTTON_COUNT = 3;
 
-const int _buttonPins[_buttonCount] = { BUTTON_0_PIN, BUTTON_1_PIN, BUTTON_2_PIN };
+Button _buttons[_BUTTON_COUNT] = {
+  Button(BUTTON_0_PIN, 0),
+  Button(BUTTON_1_PIN, 1),
+  Button(BUTTON_2_PIN, 2)
+};
 
-Button* _buttons[_buttonCount];
-
-void buttonSetup() {
-  for (int i = 0; i < _buttonCount; i++) {
-
-    int pin = _buttonPins[i];
-
-    Button* button = new Button(pin);
-
-    button->singlePress(singlePress, i);
-    button->doublePress(doublePress, i);
-    button->longPress(longPress, i);
-
-    _buttons[i] = button;
+void buttonInit() {
+  for (int i = 0; i < _BUTTON_COUNT; i++) {
+    Button button = _buttons[i];
+    button.setSinglePressCallback(onSinglePress);
+    button.setDoublePressCallback(onDoublePress);
+    button.setLongPressCallback(onLongPress);
   }
 }
 
 
-void buttonLoop() {
-  for (int i = 0; i < _buttonCount; i++) {
-    _buttons[i]->loop();
+void buttonUpdate() {
+  for (int i = 0; i < _BUTTON_COUNT; i++) {
+    _buttons[i].update();
   }
 }
 
-void singlePress(int button) {
+void onSinglePress(int button) {
 
   String str = "Button pressed: ";
   str += button;
@@ -39,7 +35,7 @@ void singlePress(int button) {
   playRhythm(button);
 }
 
-void doublePress(int button) {
+void onDoublePress(int button) {
 
   String str = "Button double pressed: ";
   str += button;
@@ -48,7 +44,7 @@ void doublePress(int button) {
   startDetection();
 }
 
-void longPress(int button) {
+void onLongPress(int button) {
 
   String str = "Button long pressed: ";
   str += button;

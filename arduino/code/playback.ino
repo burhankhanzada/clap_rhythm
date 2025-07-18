@@ -9,12 +9,12 @@ PlaybackState _playbackState = PLAYBACK_IDLE;
 
 Rhythm _playbackRhythm;
 
-int _playbackIndex;
-int _playbackLedPin;
+int _playbackIndex = 1; // Start from 1 index because 0 index interval is always 0
+int _playbackLedPin = -1;
 unsigned long _playbackStartTime;
 
 void playRhythm(int slot) {
-  if (slot < 0 || slot >= maxRhythms) {
+  if (slot < 0 || slot >= MAX_RHYTHMS) {
     Serial.println("Invalid slot");
     return;
   }
@@ -30,20 +30,19 @@ void playRhythm(int slot) {
   _playbackRhythm = rhythms[slot];
   _playbackLedPin = getLEDPin(slot);
 
-  playFirstClap();
+  playFirstClap(); // Play first clap because its interval is always 0
 
-  _playbackIndex = 1;
   _playbackState = PLAYBACK_PLAYING;
   _playbackStartTime = millis();
 }
 
 void playFirstClap() {
-  tone(BUZZER_PIN, _buzzerTone, clapDuration);
+  tone(BUZZER_PIN, _buzzerTone, CLAP_DURATION);
   digitalWrite(_playbackLedPin, HIGH);
   Serial.println("Interval 0 at 0");
 }
 
-void playbackLoop() {
+void playbackUpdate() {
   if (_playbackState == PLAYBACK_IDLE) return;
 
   digitalWrite(_playbackLedPin, LOW);
@@ -62,7 +61,7 @@ void playbackLoop() {
   if (currentTime - _playbackStartTime >= interval) {
 
     // Play next clap
-    tone(BUZZER_PIN, _buzzerTone, clapDuration);
+    tone(BUZZER_PIN, _buzzerTone, CLAP_DURATION);
     digitalWrite(_playbackLedPin, HIGH);
 
     String str = "Interval ";

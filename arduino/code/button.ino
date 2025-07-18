@@ -1,118 +1,124 @@
-typedef void (*Callback)(void *);
-
 class Button {
 public:
 
-  Button(int pin)
-    : _pin(pin) {
+  typedef void (*Callback)(int);
+
+  Button(int pin, int id)
+    : pin_(pin), id_(id) {
     pinMode(pin, INPUT_PULLUP);
   }
 
-  void singlePress(Callback callBack, void *parameter) {
-    _singlePressParam = parameter;
+  void setSinglePressCallback(Callback callBack) {
     _singlePressCallback = callBack;
   }
 
-  void doublePress(Callback callBack, void *parameter) {
-    _doublePressParam = parameter;
+  void setDoublePressCallback(Callback callBack) {
     _doublePressCallback = callBack;
   }
 
-  void longPress(Callback callBack, void *parameter) {
-    _longPressParam = parameter;
+  void setLongPressCallback(Callback callBack) {
     _longPressCallback = callBack;
   }
 
-  void loop() {
-    
+  void update() {
+
     unsigned long currentTime = millis();
 
-    bool isPressed = digitalRead(_pin) == LOW;
+    bool isPressed = digitalRead(pin_) == LOW;
+
+    // Simple debouncing
+    if (currentTime - _lastDebounceTime < _DEBOUNCE_DURATION) {
+      return;
+    }
+
+    // Check for state change
+    if (isPressed != _lastButtonPressState) {
+      _lastDebounceTime = currentTime;
+      _lastButtonPressState = isPressed;
+    }
 
     switch (_currentState) {
-      case IDLE:
+      case BUTTON_IDLE:
 
         if (isPressed) {
           _pressCount = 0;
           _pressStartTime = currentTime;
-          _currentState = PRESSED;
+          _currentState = BUTTON_PRESSED;
+          _longPressTriggered = false;
         }
         break;
 
-      case PRESSED:
+      case BUTTON_PRESSED:
 
         if (!isPressed) {
+          _pressCount++;
           _pressStartTime = currentTime;
-          _currentState = RELEASED;
+          _currentState = BUTTON_RELEASED;
         }
 
-        else if (currentTime - _pressStartTime > _longPressDuration && _longPressCallback) {
-          _longPressCallback(_longPressParam);
-          _currentState = WAIT_RELEASE;
+        else if (currentTime - _pressStartTime > _LONG_PRESS_DURATION && _longPressCallback) {
+          _longPressCallback(id_);
+          _longPressTriggered = true;
+          _currentState = BUTTON_WAIT_RELEASE;
         }
         break;
 
-      case RELEASED:
-
-        _pressCount++;
-        _pressStartTime = currentTime;
-        _currentState = WAIT_DOUBLE;
-        break;
-
-      case WAIT_DOUBLE:
+      case BUTTON_RELEASED:
 
         if (isPressed) {
+          // Another press detected
           _pressStartTime = currentTime;
-          _currentState = PRESSED;
+          _currentState = BUTTON_PRESSED;
         }
 
-        if (currentTime - _pressStartTime > _doublePressWindow) {
+        if (currentTime - _pressStartTime > _DOUBLE_PRESS_WINDOW) {
+          // Timeout - execute appropriate callback
 
           if (_pressCount == 1 && _singlePressCallback) {
-            _singlePressCallback(_singlePressParam);
+            _singlePressCallback(id_);
           }
 
           else if (_pressCount == 2 && _doublePressCallback) {
-            _doublePressCallback(_doublePressParam);
+            _doublePressCallback(id_);
           }
 
-          _currentState = IDLE;
+          _currentState = BUTTON_IDLE;
         }
-
         break;
 
-      case WAIT_RELEASE:
+      case BUTTON_WAIT_RELEASE:
 
         if (!isPressed) {
-          _currentState = IDLE;
+          _currentState = BUTTON_IDLE;
         }
         break;
     }
   }
 
 private:
-  const int _pin;
 
   enum _State {
-    IDLE,
-    PRESSED,
-    RELEASED,
-    WAIT_DOUBLE,
-    WAIT_RELEASE
+    BUTTON_IDLE,
+    BUTTON_PRESSED,
+    BUTTON_RELEASED,
+    BUTTON_WAIT_RELEASE
   };
 
-  _State _currentState = IDLE;
+  _State _currentState = BUTTON_IDLE;
 
-  const unsigned long _doublePressWindow = 400;
-  const unsigned long _longPressDuration = 800;
+  const int pin_;
+  const int id_;
+
+  const unsigned long _DEBOUNCE_DURATION = 50;
+  const unsigned long _DOUBLE_PRESS_WINDOW = 400;
+  const unsigned long _LONG_PRESS_DURATION = 800;
+
+  bool _longPressTriggered = false;
+  bool _lastButtonPressState = HIGH;
 
   int _pressCount = 0;
   unsigned long _lastDebounceTime = 0;
   unsigned long _pressStartTime = 0;
-
-  void *_singlePressParam = nullptr;
-  void *_doublePressParam = nullptr;
-  void *_longPressParam = nullptr;
 
   Callback _singlePressCallback = nullptr;
   Callback _doublePressCallback = nullptr;

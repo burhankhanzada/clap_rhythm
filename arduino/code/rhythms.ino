@@ -1,4 +1,6 @@
-const long unsigned rhythmTimeout = 2000;
+const unsigned long _RHYTHM_TIMEOUT = 3000;
+
+const float _RHYTHM_TOLERANCE = 0.25f;  // 25% Error tolerance
 
 enum RhythmState {
   RHYTHM_IDLE,
@@ -7,7 +9,7 @@ enum RhythmState {
   RHYTHM_RECOGNIZING,
 };
 
-RhythmState _currentRhythmState = RHYTHM_IDLE;
+RhythmState _rhythmState = RHYTHM_IDLE;
 
 int _slot;
 int _rhythmLedPin;
@@ -17,9 +19,10 @@ unsigned long _startTime;
 unsigned long _lastClapTime;
 bool _firstClapDetected = false;
 
-void rhythmLoop() {
+void rhythmUpdate() {
+  if (_rhythmState == RHYTHM_IDLE) return;
 
-  switch (_currentRhythmState) {
+  switch (_rhythmState) {
     case RHYTHM_RECORDING:
     case RHYTHM_DETECTING:
       recordRhythm();
@@ -37,17 +40,19 @@ void startRecording(int slot) {
   _recordingRhythm.intervalCount = 0;
   _firstClapDetected = false;
   Serial.println("Rhythm recording start");
-  _currentRhythmState = RHYTHM_RECORDING;
+  _rhythmState = RHYTHM_RECORDING;
 }
 
 void stopRecording() {
 
-  if (_currentRhythmState == RHYTHM_DETECTING) {
-    _currentRhythmState = RHYTHM_RECOGNIZING;
+  setLedOff();
+
+  if (_rhythmState == RHYTHM_DETECTING) {
+    _rhythmState = RHYTHM_RECOGNIZING;
     return;
   }
 
-  _currentRhythmState = RHYTHM_IDLE;
+  _rhythmState = RHYTHM_IDLE;
   saveRhythm();
 }
 
@@ -58,11 +63,11 @@ void startDetection() {
   _recordingRhythm.intervalCount = 0;
   _firstClapDetected = false;
   Serial.println("Rhythm detection start");
-  _currentRhythmState = RHYTHM_DETECTING;
+  _rhythmState = RHYTHM_DETECTING;
 }
 
 void stopDetection() {
-  _currentRhythmState = RHYTHM_IDLE;
+  _rhythmState = RHYTHM_IDLE;
   setLedOff();
 }
 
@@ -76,9 +81,12 @@ void recordRhythm() {
 
   unsigned long currentTime = millis();
 
-  digitalWrite(_rhythmLedPin, HIGH);
+  // Turn on led only in recoridng mode so that in detection mode this doesnt affect cycling of leds
+  if (_rhythmState == RHYTHM_RECORDING) {
+    digitalWrite(_rhythmLedPin, HIGH);
+  }
 
-  if (!_firstClapDetected && (currentTime - _startTime > rhythmTimeout)) {
+  if (!_firstClapDetected && (currentTime - _startTime > _RHYTHM_TIMEOUT)) {
     Serial.println("Rhythm timeout reached (no claps detected), nothing saved");
     stopRecording();
     return;
@@ -86,13 +94,13 @@ void recordRhythm() {
 
   if (_firstClapDetected) {
 
-    if (_recordingRhythm.intervalCount >= maxClaps - 1) {
+    if (_recordingRhythm.intervalCount >= MAX_CLAPS - 1) {
       Serial.println("Max claps reached, rhythm saved");
       stopRecording();
       return;
     }
 
-    else if (currentTime - _lastClapTime > rhythmTimeout) {
+    else if (currentTime - _lastClapTime > _RHYTHM_TIMEOUT) {
       Serial.println("Rhythm timeout reached (after claps), rhythm saved");
       stopRecording();
       return;
@@ -111,7 +119,7 @@ void recordRhythm() {
       Serial.println("Clap 0 at interval 0");
     }
 
-    else if (currentTime - _lastClapTime > clapDuration) {
+    else if (currentTime - _lastClapTime > CLAP_DURATION) {
 
       int count = _recordingRhythm.intervalCount;
 
@@ -138,7 +146,7 @@ void recognizeRhythm() {
 
   int count = _recordingRhythm.intervalCount;
 
-  if (currentTime - _startTime > rhythmTimeout && count > 0) {
+  if (currentTime - _startTime > _RHYTHM_TIMEOUT && count > 0) {
 
     int matchedSlot = matchRhythm();
 
@@ -166,7 +174,7 @@ int matchRhythm() {
 
   if (_recordingRhythm.intervalCount < 1) return -1;
 
-  for (int i = 0; i < maxRhythms; i++) {
+  for (int i = 0; i < MAX_RHYTHMS; i++) {
 
     Rhythm rhythm = rhythms[i];
 
@@ -174,7 +182,7 @@ int matchRhythm() {
 
     bool match = true;
 
-    for (int j = 0; j < _recordingRhythm.intervalCount; j++) {
+    for (int j = 1; j < _recordingRhythm.intervalCount; j++) {  // Start from 1 because first interval is always 0
 
       long x = rhythm.intervals[j];
       long y = _recordingRhythm.intervals[j];
@@ -196,7 +204,7 @@ int matchRhythm() {
 
       Serial.println(str);
 
-      if (errorRatio > 0.2) {  // 20% tolerance
+      if (errorRatio > _RHYTHM_TOLERANCE) {
         match = false;
         break;
       }
