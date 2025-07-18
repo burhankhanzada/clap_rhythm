@@ -11,7 +11,7 @@ Rhythm _playbackRhythm;
 
 int _playbackIndex = 1; // Start from 1 index because 0 index interval is always 0
 int _playbackLedPin = -1;
-unsigned long _playbackStartTime;
+unsigned long _playbackStartTime = 0;
 
 void playRhythm(int slot) {
   if (slot < 0 || slot >= MAX_RHYTHMS) {

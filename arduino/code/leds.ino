@@ -16,8 +16,8 @@ enum _LedState {
 
 _LedState _currentLedState;
 
-int _blinkCount = 0;
-int _currentLedIndex = 0;
+int _blinkCount = -1;
+int _currentLedIndex = -1;
 unsigned long _lastLedTime = 0;
 
 void ledInit() {
