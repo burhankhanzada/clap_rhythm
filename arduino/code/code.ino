@@ -19,15 +19,15 @@ void setup() {
   pinMode(SOUND_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
-  ledInit();
-  buttonInit();
+  ledSetup();
+  buttonSetup();
 
   loadRhythmsFromEEPROM();
 }
 
 void loop() {
-  ledUpdate();
-  buttonUpdate();
-  rhythmUpdate();
-  playbackUpdate();
+  ledLoop();
+  buttonLoop();
+  rhythmLoop();
+  playbackLoop();
 }

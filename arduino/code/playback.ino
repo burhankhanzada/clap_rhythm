@@ -27,7 +27,6 @@ void playRhythm(int slot) {
 
   Serial.println("Rhythm playing start");
 
-  _playbackIndex = 1;  // Start from 1 index because 0 index interval is always 0
 
   _playbackRhythm = rhythms[slot];
   _playbackLedPin = getLEDPin(slot);
@@ -39,12 +38,13 @@ void playRhythm(int slot) {
 }
 
 void playFirstClap() {
+  _playbackIndex = 1; // Start from 1 index because 0 index interval is always 0
   tone(BUZZER_PIN, _buzzerTone, CLAP_DURATION);
   digitalWrite(_playbackLedPin, HIGH);
   Serial.println("Interval 0 at 0");
 }
 
-void playbackUpdate() {
+void playbackLoop() {
   if (_playbackState == PLAYBACK_IDLE) return;
 
   digitalWrite(_playbackLedPin, LOW);

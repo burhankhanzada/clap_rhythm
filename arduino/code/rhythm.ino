@@ -19,7 +19,7 @@ unsigned long _startTime = 0;
 unsigned long _lastClapTime = 0;
 bool _firstClapDetected = false;
 
-void rhythmUpdate() {
+void rhythmLoop() {
   if (_rhythmState == RHYTHM_IDLE) return;
 
   switch (_rhythmState) {

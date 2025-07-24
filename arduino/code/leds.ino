@@ -20,7 +20,7 @@ int _blinkCount = -1;
 int _currentLedIndex = -1;
 unsigned long _lastLedTime = 0;
 
-void ledInit() {
+void ledSetup() {
   for (int i = 0; i < _LED_COUNT; i++) {
     int pin = _LED_PINS[i];
     pinMode(pin, OUTPUT);
@@ -30,7 +30,7 @@ void ledInit() {
   setLedOff();
 }
 
-void ledUpdate() {
+void ledLoop() {
 
   switch (_currentLedState) {
     case LED_OFF:

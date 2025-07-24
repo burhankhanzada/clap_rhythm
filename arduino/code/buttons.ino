@@ -10,7 +10,7 @@ Button _buttons[_BUTTON_COUNT] = {
   Button(BUTTON_2_PIN, 2)
 };
 
-void buttonInit() {
+void buttonSetup() {
   for (int i = 0; i < _BUTTON_COUNT; i++) {
     _buttons[i].setSinglePressCallback(onSinglePress);
     _buttons[i].setDoublePressCallback(onDoublePress);
@@ -19,7 +19,7 @@ void buttonInit() {
 }
 
 
-void buttonUpdate() {
+void buttonLoop() {
   for (int i = 0; i < _BUTTON_COUNT; i++) {
  
     _buttons[i].update();
