@@ -24,12 +24,12 @@ public:
 
     unsigned long currentTime = millis();
 
-    bool isPressed = digitalRead(pin_) == LOW;
-
     // Simple debouncing
     if (currentTime - _lastDebounceTime < _DEBOUNCE_DURATION) {
       return;
     }
+
+    bool isPressed = digitalRead(pin_) == LOW;
 
     // Check for state change
     if (isPressed != _lastButtonPressState) {
@@ -50,7 +50,8 @@ public:
 
       case BUTTON_PRESSED:
 
-        if (!isPressed) {
+        // Increase counter if relased in short time means a single press
+        if (!isPressed) { 
           _pressCount++;
           _pressStartTime = currentTime;
           _currentState = BUTTON_RELEASED;

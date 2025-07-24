@@ -9,7 +9,7 @@ PlaybackState _playbackState = PLAYBACK_IDLE;
 
 Rhythm _playbackRhythm;
 
-int _playbackIndex = 1; // Start from 1 index because 0 index interval is always 0
+int _playbackIndex = -1;
 int _playbackLedPin = -1;
 unsigned long _playbackStartTime = 0;
 
@@ -27,10 +27,12 @@ void playRhythm(int slot) {
 
   Serial.println("Rhythm playing start");
 
+  _playbackIndex = 1;  // Start from 1 index because 0 index interval is always 0
+
   _playbackRhythm = rhythms[slot];
   _playbackLedPin = getLEDPin(slot);
 
-  playFirstClap(); // Play first clap because its interval is always 0
+  playFirstClap();  // Play first clap because its interval is always 0
 
   _playbackState = PLAYBACK_PLAYING;
   _playbackStartTime = millis();

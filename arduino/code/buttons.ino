@@ -12,16 +12,16 @@ Button _buttons[_BUTTON_COUNT] = {
 
 void buttonInit() {
   for (int i = 0; i < _BUTTON_COUNT; i++) {
-    Button button = _buttons[i];
-    button.setSinglePressCallback(onSinglePress);
-    button.setDoublePressCallback(onDoublePress);
-    button.setLongPressCallback(onLongPress);
+    _buttons[i].setSinglePressCallback(onSinglePress);
+    _buttons[i].setDoublePressCallback(onDoublePress);
+    _buttons[i].setLongPressCallback(onLongPress);
   }
 }
 
 
 void buttonUpdate() {
   for (int i = 0; i < _BUTTON_COUNT; i++) {
+ 
     _buttons[i].update();
   }
 }
