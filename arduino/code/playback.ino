@@ -31,7 +31,7 @@ void playRhythm(int slot) {
   _playbackRhythm = rhythms[slot];
   _playbackLedPin = getLEDPin(slot);
 
-  playFirstClap();  // Play first clap because its interval is always 0
+  playFirstClap(); // Play first clap because its interval is always 0
 
   _playbackState = PLAYBACK_PLAYING;
   _playbackStartTime = millis();
