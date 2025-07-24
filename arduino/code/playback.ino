@@ -27,7 +27,6 @@ void playRhythm(int slot) {
 
   Serial.println("Rhythm playing start");
 
-
   _playbackRhythm = rhythms[slot];
   _playbackLedPin = getLEDPin(slot);
 
